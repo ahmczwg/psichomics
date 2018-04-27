@@ -1,0 +1,132 @@
+Package: psichomics
+Title: Graphical Interface for Alternative Splicing Quantification, Analysis and
+    Visualisation
+Version: 1.4.5
+Encoding: UTF-8
+Authors@R: c( person("Nuno", "Saraiva-Agostinho", ,
+        "nunodanielagostinho@gmail.com", role = c("aut", "cre")),
+        person(c("Nuno", "Luís"), "Barbosa-Morais",
+        role=c("aut", "led", "ths")),
+        person("André", "Falcão", role="ths"), person("Lina",
+        "Gallego Paez", role="ctb"), person("Marie", "Bordone",
+        role="ctb"), person("Teresa", "Maia", role="ctb"),
+        person("Mariana", "Ferreira", role="ctb"), person("Ana Carolina", 
+        "Leote", role="ctb"), person("Bernardo", "de Almeida", role="ctb"))
+Description: Interactive R package with an intuitive Shiny-based graphical 
+    interface for alternative splicing quantification and integrative analyses 
+    of alternative splicing and gene expression from large transcriptomic 
+    datasets, including those from The Cancer Genome Atlas (TCGA) and the 
+    Genotype-Tissue Expression project (GTEx), as well as user-owned data. The 
+    tool interactively performs survival, dimensionality reduction and median- 
+    and variance-based differential splicing and gene expression analyses that 
+    benefit from the incorporation of clinical and molecular sample-associated 
+    features (such as tumour stage or survival). Interactive visual access to 
+    genomic mapping and functional annotation of selected alternative splicing
+    events is also included.
+Depends:
+    R (>= 3.4),
+    shiny (>= 1.0.3),
+    shinyBS
+License: MIT + file LICENSE
+LazyData: true
+RoxygenNote: 6.0.1
+Imports:
+    AnnotationHub,
+    cluster,
+    colourpicker,
+    data.table,
+    digest,
+    dplyr,
+    DT (>= 0.2),
+    edgeR,
+    fastICA,
+    fastmatch,
+    ggplot2,
+    ggrepel,
+    grDevices,
+    highcharter (>= 0.5.0),
+    htmltools,
+    httr,
+    jsonlite,
+    limma,
+    miscTools,
+    pairsD3,
+    plyr,
+    Rcpp (>= 0.12.14),
+    R.utils,
+    shinyjs,
+    stringr,
+    stats,
+    survival,
+    tools,
+    utils,
+    XML,
+    xtable,
+    methods
+Suggests:
+    testthat,
+    knitr,
+    parallel,
+    devtools,
+    rmarkdown,
+    gplots,
+    covr,
+    car
+LinkingTo: Rcpp
+VignetteBuilder: knitr
+Collate: 
+    'RcppExports.R'
+    'utils.R'
+    'globalAccess.R'
+    'app.R'
+    'analysis.R'
+    'analysis_correlation.R'
+    'analysis_diffExpression.R'
+    'analysis_diffExpression_event.R'
+    'analysis_diffExpression_table.R'
+    'analysis_diffSplicing.R'
+    'analysis_diffSplicing_event.R'
+    'analysis_diffSplicing_table.R'
+    'analysis_dimReduction.R'
+    'analysis_dimReduction_ica.R'
+    'analysis_dimReduction_pca.R'
+    'analysis_information.R'
+    'analysis_survival.R'
+    'analysis_template.R'
+    'data.R'
+    'formats.R'
+    'data_firebrowse.R'
+    'data_geNormalisationFiltering.R'
+    'data_gtex.R'
+    'data_inclusionLevels.R'
+    'data_local.R'
+    'events_suppa.R'
+    'events_vastTools.R'
+    'events_miso.R'
+    'events_mats.R'
+    'events.R'
+    'formats_firebrowseGeneExpression.R'
+    'formats_firebrowseJunctionReads.R'
+    'formats_firebrowseMergeClinical.R'
+    'formats_firebrowseNormalizedGeneExpression.R'
+    'formats_genericClinical.R'
+    'formats_genericGeneExpression.R'
+    'formats_genericInclusionLevels.R'
+    'formats_genericJunctionReads.R'
+    'formats_genericSampleInfo.R'
+    'formats_gtexClinical.R'
+    'formats_gtexGeneReadsFormat.R'
+    'formats_gtexJunctionReads.R'
+    'formats_gtexSampleInfo.R'
+    'formats_gtexV7Clinical.R'
+    'formats_gtexV7JunctionReads.R'
+    'formats_psichomicsGeneExpression.R'
+    'formats_psichomicsInclusionLevels.R'
+    'groups.R'
+    'help.R'
+biocViews: Sequencing, RNASeq, AlternativeSplicing,
+    DifferentialSplicing, Transcription, GUI, PrincipalComponent,
+    Survival, BiomedicalInformatics, Transcriptomics,
+    Visualization, MultipleComparison, GeneExpression, DifferentialExpression
+URL: https://github.com/nuno-agostinho/psichomics
+BugReports: https://github.com/nuno-agostinho/psichomics/issues
