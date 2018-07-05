@@ -1,7 +1,7 @@
 ---
 title: 'psichomics case study: visual interface'
 author: "Nuno Saraiva-Agostinho"
-date: "11 Feb 2018"
+date: "`r Sys.Date()`"
 bibliography: refs.bib
 csl: bioinformatics.csl
 output:
@@ -16,22 +16,21 @@ vignette: >
 ---
 
 *psichomics* is an interactive R package for integrative analyses of alternative
-splicing using data from [The Cancer Genome Atlas (TCGA)][5] (containing 
-molecular data associated with 34 tumour types) and from the
-[Genotype-Tissue Expression (GTEx)][8] project (containing data for multiple
-normal human tissues). The data leveraged from these projects includes clinical 
-information and transcriptomic data, such as the quantification of RNA-Seq reads
-aligning to splice junctions (henceforth called junction quantification) and
-exons.
+splicing using data from [The Cancer Genome Atlas (TCGA)][TCGA] (containing 
+molecular data associated with 34 tumour types), from the
+[Genotype-Tissue Expression (GTEx)][GTEx] project (containing data for multiple
+normal human tissues) and from the [Sequence Read Archive][SRA]. The data
+leveraged from these projects includes clinical/sample-associated information 
+and transcriptomic data, such as the quantification of RNA-Seq reads aligning to
+splice junctions (henceforth called junction quantification) and exons.
 
 # Installing and starting the program
 Install *psichomics* by typing the following in an R console (the 
 [R environment](https://www.r-project.org/) is required):
 
 ```{r, eval=FALSE}
-## try http:// if https:// URLs are not supported
-source("https://bioconductor.org/biocLite.R")
-biocLite("psichomics")
+install.packages("BiocManager")
+BiocManager::install("psichomics")
 ```
 
 After the installation, start the visual interface of the program in your 
@@ -45,7 +44,7 @@ psichomics()
 # Exploration of clinically-relevant, differentially spliced events in breast cancer
 
 > The following case study can be read in *psichomics*' original article:
-[**Saraiva-Agostinho N and Barbosa-Morais NL (2018) "psichomics: graphical application for alternative splicing quantification and analysis". *bioRxiv*.**][10]
+[**Saraiva-Agostinho N and Barbosa-Morais NL (2018) "psichomics: graphical application for alternative splicing quantification and analysis". *bioRxiv*.**][article]
 
 Breast cancer is the cancer type with the highest incidence and mortality in 
 women [@Torre2015] and multiple studies have suggested that transcriptome-wide
@@ -90,8 +89,8 @@ confirmation before allowing such behaviour. In order to proceed, please allow
 multiple downloads.
 
 > **Windows limitations**: If you are using *Windows*, note that the downloaded 
-files have huge names that may be over [*Windows* Maximum Path Length][9]. A 
-workaround would be to manually rename the downloaded files to have shorter 
+files have huge names that may be over [*Windows* Maximum Path Length][maxpath].
+A workaround would be to manually rename the downloaded files to have shorter 
 names, move all downloaded files to a single folder and load such folder by
 going to **Load user files** > **Folder input** and selecting the newly-created 
 folder in **Folder where data is stored**.
@@ -121,17 +120,19 @@ After loading the clinical and alternative splicing junction quantification data
 from TCGA, quantify alternative splicing by clicking the green panel 
 **Alternative splicing quantification**.
 
-1. Select the junction quantification dataset to use from the loaded data. For 
-many tumour types, only one dataset is provided.
-2. Designate the alternative splicing event annotation 
+1. From the loaded data, select the junction quantification dataset to use in 
+**Alternative splicing junction quantification**. For many tumour types, only 
+one dataset is provided.
+2. Select the alternative splicing event annotation 
 **Human hg19/GRCh37 (2017-10-20)**. Note that there are other annotation files
 available and you can also load custom annotation files.
 
 > **Custom splicing annotation:** Additional alternative splicing annotations 
 can be prepared for *psichomics* by parsing the annotation from programs like 
-[VAST-TOOLS][4], [MISO][3], [SUPPA][1] and [rMATS][2]. Note that SUPPA and rMATS
-are able to create their splicing annotation based on transcript annotation. For
-more information, [read this tutorial][6].
+[VAST-TOOLS][VAST-TOOLS], [MISO][MISO], [SUPPA][SUPPA] and [rMATS][rMATS]. Note 
+that SUPPA and rMATS are able to create their splicing annotation based on
+transcript annotation. For more information, 
+[read this tutorial][annotation-tutorial].
 
 3. Choose the event type(s) of interest. For the purposes of following the case
 study, select **Skipped exon (SE)**, **Mutually exclusive exon (MXE)**,
@@ -147,7 +148,7 @@ knitr::include_graphics("img/3_quantify_splicing.png")
 
 ## Data grouping
 In order to group data for downstream analyses, look for the navigation bar on 
-the top and click **Groups**. In the displayed table, verify that three groups
+the top and click **Groups**. In the displayed table, confirm that three groups
 are automatically present based on the available sample types: *Metastatic*,
 *Primary solid Tumor* and *Solid Tissue Normal*.
 
@@ -218,24 +219,24 @@ To perform PCA on alternative splicing data using all samples:
 
 > As PCA cannot be performed on data with missing values, missing values need to
 be either removed (thus discarding data from whole splicing events or genes) or 
-impute them (i.e. attributing to missing values the median of the non-missing 
-ones). This input allows to select the number of missing values that are 
-tolerable per event (i.e. if a splicing event or gene has less than N missing 
-values, those missing values will be imputed; otherwise, the event is discarded 
-from PCA).
+imputed (i.e. attributing to missing values the median of the non-missing ones).
+This input allows to select the number of missing values that are tolerable per 
+event (i.e. if a splicing event or gene has less than N missing values, those 
+missing values will be imputed; otherwise, the event is discarded from PCA).
 
 5. Perform PCA on *All genes and splicing events*.
 6. Click **Calculate PCA**.
 
 ### PCA plotting
 After PCA is performed, the *Plot PCA* panel will automatically open. Note that
-the explained variance of each principal component is shown next to the 
-respective component. The **variance plot** is also available to compare the
-explained variance across principal components (by clicking 
+the explained variance of each principal component (PC) is shown next to the 
+respective component and that PC1 explains most of the data variance, followed 
+by PC2, then PC3, then PC4, etc. The **variance plot** is also available to 
+compare the explained variance across principal components (by clicking 
 **Show variance plot**). Now:
 
-1. Select the principal component (PC) 1 for the X axis.
-2. Select the PC2 for the Y axis.
+1. Select PC1 as the X axis.
+2. Select PC2 as the Y axis.
 3. In **Sample colouring**, select **Colour using selected groups** and in the
 group selection input insert *Tumour Stage I*, *Tumour Stage II*, 
 *Tumour Stage III*, *Tumour Stage IV* and *Solid Tissue Normal*.
@@ -253,7 +254,7 @@ knitr::include_graphics("img/5_pca.png")
 Two PCA plots are then rendered. The plot above is a **score plot** that shows
 the clinical samples, while the **loadings plot** below displays the variables 
 (in this case, alternative splicing events). The table below the loadings plot
-depict the contribution of each variable to each PC.
+depicts the contribution of each variable to each PC.
 
 > **Hint:** As most plots in *psichomics*, PCA plots can be zoomed-in by
 clicking-and-dragging within the plot (click *Reset zoom* to zoom-out). To 
@@ -270,11 +271,10 @@ samples, click on the blue **Perform PCA** panel and select to
 select *Tumour Stage 1* and *Solid Tissue Normal*. Afterwards, click 
 **Perform PCA** and follow the same steps as before to plot it.
 
-By clicking on one alternative splicing event in the loadings plot, differential
-splicing analysis for that splicing event across selected groups will be shown. 
-Click on one of the events that most contribute to the separation between tumour
-stage I and normal samples (one of the events with extreme values for the X 
-axis).
+Now, click on one of the events that most contribute to the separation between 
+tumour stage I and normal samples (one of the events with extreme values for the
+PC1; i.e. the X axis). Differential splicing analysis for that splicing event 
+across selected groups are shown.
 
 To perform PCA using gene expression (both using all samples and only Tumour
 Stage I and Normal samples), go back to principal component analysis, click in 
@@ -296,7 +296,7 @@ the selected alternative splicing event can be altered by clicking
 **Change...**. Click **Change...** and input the given identifier.
 
 ### Differential inclusion of *NUMB* exon 12
-Let's check whether a significant difference in *NUMB* exon 12 inclusion
+In order to check whether a significant difference in *NUMB* exon 12 inclusion
 between tumour and normal TCGA breast samples. To do so, go to **Analyses** > 
 **Individual alternative splicing event** and click 
 **Samples by selected groups**. In the group input element, insert the groups 
@@ -318,7 +318,7 @@ knitr::include_graphics("img/NUMB_exon_12_inclusion.png")
 ```
 
 ### Correlation between *NUMB* exon 12 inclusion and QKI expression
-To verify if *NUMB* exon 12 inclusion is correlated with QKI expression, go to
+To check if *NUMB* exon 12 inclusion is correlated with QKI expression, go to
 **Analyses** > **Correlation of gene expression and alternative splicing** and
 perform the following:
 
@@ -331,7 +331,7 @@ the first hit.
 4. Perform correlation analysis on **All samples**.
 5. Correlation method should be set to **Spearman's rank correlation rho**.
 6. Set the alternative hypothesis to **Two-sided**.
-7. Finally, ignore the rest of the options and click **Correlate**.
+7. Finally, leave remaining options as default and click **Correlate**.
 
 According to the obtained results and also consistent with the previous article,
 the inclusion of the exon is negatively correlated with QKI expression.
@@ -346,8 +346,7 @@ To analyse differential splicing, click on the **Analyses** tab located in the
 navigation menu at the top and select 
 **Exploratory (multiple splicing events)**. Next:
 
-1. Click on the blue panel **Perform statistical analyses** (if not open
-already).
+1. Click on the blue panel **Perform statistical analyses** to open it.
 2. In **Groups of samples to analyse**, click on **Samples by selected groups**.
 3. Select the *Tumour Stage I* and *Solid Tissue Normal* groups.
 4. In **Splicing events to analyse**, select **All splicing events**.
@@ -363,8 +362,7 @@ and sortable table.
 Filter events in both the plot and the table by a considerable difference in
 median between the selected groups (|Δ Median PSI| > 0.1):
 
-1. Click on the blue panel **Plot options and table filtering** (if not 
-open already).
+1. Click on the blue panel **Plot options and table filtering** to open it.
 2. Click on the **X axis** tab.
 3. Check if *Δ Median* is selected for the X axis.
 4. Click on **Highlight points based on Y values** and select values lower than
@@ -376,10 +374,10 @@ Next, filter statistically significant splicing events
 
 1. Click on the **Y axis** tab.
 2. Select *Wilcoxon p-value (BH adjusted)* for the Y axis.
-3. In **Data transformation of Y values**, select *-log10(y)*.
+3. In **Data transformation of Y values**, select *-log10(|y|)*.
 4. Click on **Highlight points based on Y values** and change the minimum value
 to filter significant events. For instance, to consider a p-value of 0.01 or
-lower, the minimum should be 2, i.e. -log10(0.01).
+lower, the lower limit should be -log10(0.01), i.e. 2.
 
 ```{r, echo=FALSE, fig.retina=NULL, out.width='800pt', fig.cap="Differentially spliced events (|Δ Median PSI| > 0.1 and Wilcoxon q-value ≤ 0.01). Labelled splicing events have putative prognostic value (more on that in the following section)."}
 knitr::include_graphics("img/diff_analyses.png")
@@ -405,10 +403,10 @@ will show up.
 
 To study the impact of alternative splicing events on prognosis, Kaplan-Meier
 curves may be plotted for groups of patients separated by the optimal PSI 
-cutoff for a given alternative splicing event that that maximises the 
-significance of group differences in survival analysis (i.e. minimises the 
-p-value of the log-rank tests of difference in survival between individuals 
-whose samples have their PSI below and above that threshold).
+cutoff for a given alternative splicing event that maximises the significance of
+group differences in survival analysis (i.e. minimises the p-value of the 
+log-rank tests of difference in survival between individuals whose samples have
+their PSI below and above that threshold).
 
 Given the slow process of calculating the optimal splicing quantification 
 cutoff for multiple events, it is recommended to perform this after filtering 
@@ -439,8 +437,8 @@ should also be performed. To do so, click on the **Analyses** tab located in the
 navigation menu at the top and select 
 **Exploratory (multiple genes)**. Next:
 
-1. Click on the blue panel **Perform differential expression analyses** (if not 
-open already).
+1. Click on the blue panel **Perform differential expression analyses** to open 
+it.
 2. In **Gene expression dataset**, select **Gene expression (normalised)**.
 3. Within the **Gene-wise linear model fit** panel, select the groups 
 *Tumour Stage I* and *Solid Tissue Normal* for differential expression.
@@ -470,8 +468,8 @@ Click *Change...* and input the given identifier.
 
 #### Differential splicing analysis
 
-Let's check whether a significant difference in *UHRF2* exon 10 inclusion
-between tumour stage I and normal samples. To do so, go to **Analyses** > 
+In order to test for a significant difference in *UHRF2* exon 10 inclusion
+between tumour stage I and normal samples, go to **Analyses** > 
 **Individual alternative splicing event** and click 
 **Samples by selected groups**. In the group input element, insert the groups
 *Solid Tissue Normal* and *Primary solid Tumor*. Finally, click 
@@ -499,10 +497,10 @@ To perform survival analysis on a specific event, go to **Analyses** >
 2. Use *days to death* for the **follow up time**.
 3. Use *death* as the **event of interest**.
 4. Display time in **years**.
-5. For groups in survival analysis, check 
-**Inclusion levels cutoff from the selected splicing event**.
-6. In the group selection field, select *Primary solid Tumor* to use values from
-all available tumour samples in survival analysis.
+5. To create groups of patients based on an inclusion levels cutoff, select
+**Inclusion levels cutoff from the selected splicing event**. 
+6. In **Sample filtering**, select *Primary solid Tumor* to perform survival 
+analysis using values solely from tumour samples.
 7. In the **Splicing quantification cutoff**, check the value is automatically
 set to 0.09 (the optimal cutoff).
 8. In the **Kaplan-Meier plot options**, de-select 
@@ -535,10 +533,9 @@ knitr::include_graphics("img/UHRF2_differential_expression.png")
 It seems UHRF2 is differentially expressed between *Tumour Stage I* and 
 *Solid Tissue Normal*. However, going back to exploratory differential gene 
 expression (**Analyses** > **Exploratory (multiple genes)**) and looking for 
-*UHRF2* by using the *Search* field in the table, *UHRF2* has a 
-log2(fold-change) of 0.18, low enough not to be biologically relevant (i.e. 
-log2(|fold-change|) ≤ 1). Following this criterium, the gene can thus be
-considered not to be differentially expressed between these conditions.
+*UHRF2* (use the *Search* field above the table), *UHRF2* has a 
+log2(|fold-change|) ≤ 1. Following this criterium, the difference in gene 
+expression between these conditions may not be considered biologically relevant.
 
 #### Survival analysis
 To confirm if gene expression has an overall prognostic value, go to 
@@ -608,18 +605,19 @@ All feedback on the program, documentation and associated material (including
 this tutorial) is welcome. Please send any suggestions and comments to:
 
 > Nuno Saraiva-Agostinho (nunoagostinho@medicina.ulisboa.pt)
-
-> [Disease Transcriptomics Lab, Instituto de Medicina Molecular (Portugal)][7]
+>
+> [Disease Transcriptomics Lab, Instituto de Medicina Molecular (Portugal)][iMM]
 
 # References
 
-[1]: https://bitbucket.org/regulatorygenomicsupf/suppa
-[2]: http://rnaseq-mats.sourceforge.net
-[3]: http://genes.mit.edu/burgelab/miso/
-[4]: https://github.com/vastgroup/vast-tools
-[5]: https://tcga-data.nci.nih.gov/docs/publications/tcga
-[6]: http://rpubs.com/nuno-agostinho/alt-splicing-annotation
-[7]: http://imm.medicina.ulisboa.pt/group/distrans/
-[8]: http://gtexportal.org
-[9]: https://msdn.microsoft.com/library/windows/desktop/aa365247.aspx#maxpath
-[10]: https://www.biorxiv.org/content/early/2018/02/07/261180
+[SUPPA]: https://bitbucket.org/regulatorygenomicsupf/suppa
+[rMATS]: http://rnaseq-mats.sourceforge.net
+[MISO]: http://genes.mit.edu/burgelab/miso/
+[VAST-TOOLS]: https://github.com/vastgroup/vast-tools
+[TCGA]: https://tcga-data.nci.nih.gov/docs/publications/tcga
+[annotation-tutorial]: http://rpubs.com/nuno-agostinho/alt-splicing-annotation
+[iMM]: http://imm.medicina.ulisboa.pt/group/distrans/
+[GTEx]: http://gtexportal.org
+[maxpath]: https://msdn.microsoft.com/library/windows/desktop/aa365247.aspx#maxpath
+[article]: https://doi.org/10.1101/261180
+[SRA]: https://www.ncbi.nlm.nih.gov/sra

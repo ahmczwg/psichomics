@@ -11,6 +11,26 @@ options(shiny.maxRequestSize = MB * 1024^5)
 # Sanitize errors
 options(shiny.sanitize.errors = TRUE)
 
+#' Interface that directs users to original article
+#'
+#' @importFrom shiny tags icon
+#' @return HTML elements
+linkToArticle <- function() {
+    authors <- c("Nuno Saraiva-Agostinho", "Nuno L. Barbosa-Morais")
+    title   <- paste("psichomics: graphical application for alternative",
+                     "splicing quantification and analysis.")
+    year    <- 2018
+    journal <- "bioRxiv"
+    
+    tags$a(
+        target="_blank", href="https://doi.org/10.1101/261180",
+        tags$div(
+            class="alert alert-info", role="alert",
+            icon("paper-plane-o"), 
+            sprintf("%s. %s.", paste(authors, collapse=" and "), year),
+            tags$i(tags$b(title)), paste0(journal, ".")))
+}
+
 #' Check if a given function should be loaded by the calling module
 #' @param loader Character: name of the file responsible to load such function 
 #' @param FUN Function
@@ -319,8 +339,9 @@ appServer <- function(input, output, session) {
 #' Start graphical interface of psichomics
 #'
 #' @inheritDotParams shiny::runApp -appDir -launch.browser
-#' @param reset Boolean: reset Shiny session? FALSE by default; requires the 
-#' package \code{devtools} to reset data
+#' @param reset Boolean: reset Shiny session? requires the package 
+#' \code{devtools} to reset data
+#' @param testData Boolean: auto-start with test data
 #'
 #' @importFrom shiny shinyApp runApp addResourcePath
 #'
@@ -330,12 +351,27 @@ appServer <- function(input, output, session) {
 #' psichomics()
 #' }
 #' @return NULL (this function is used to modify the Shiny session's state)
-psichomics <- function(..., reset=FALSE) {
+psichomics <- function(..., reset=FALSE, testData=FALSE) {
     # Add icons related to set operations
     addResourcePath("set-operations",
                     insideFile("shiny", "www", "set-operations"))
     
     if (reset) devtools::load_all()
+    
+    if (testData) {
+        clinical   <- readRDS("vignettes/BRCA_clinical.RDS")
+        geneExpr   <- readRDS("vignettes/BRCA_geneExpr.RDS")
+        psi        <- readRDS("vignettes/BRCA_psi.RDS")
+        sampleInfo <- parseTcgaSampleInfo(colnames(psi))
+        
+        data <- NULL
+        data[["Clinical data"]]    <- clinical
+        data[["Gene expression"]]  <- geneExpr
+        data[["Inclusion levels"]] <- psi
+        data[["Sample metadata"]]  <- sampleInfo
+        setData(list("Test data"=data))
+    }
+    
     app <- shinyApp(appUI(), appServer)
     runApp(app, launch.browser = TRUE, ...)
 }

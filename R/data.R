@@ -25,6 +25,22 @@ getFirebrowseDataTypes <- function() {
 #' @rdname getFirebrowseDataTypes
 getFirehoseDataTypes <- getFirebrowseDataTypes
 
+#' Set attributes to an object
+#' 
+#' @param object Object
+#' @param ... Named parameters to convert to attributes
+#' 
+#' @return Object with attributes set
+#' 
+#' @examples 
+#' ll <- list(a="hey", b="there")
+#' psichomics:::addObjectAttrs(ll, "words"=2, "language"="English")
+addObjectAttrs <- function (object, ...) {
+    args <- as.list(match.call())[-c(1:2)]
+    for (k in seq(args)) attr(object, names(args[k])) <- args[[k]]
+    return(object)
+}
+
 #' Parse sample information from TCGA samples
 #' 
 #' @param samples Character: sample identifiers
@@ -74,13 +90,17 @@ parseTCGAsampleInfo <- parseTcgaSampleInfo
 loadTCGAsampleMetadata <- function(data) {
     for (i in seq(data)) {
         # Retrieve sample metadata from junction quantification
-        junctionQuant <- data[[i]]$`Junction quantification`
+        match <- sapply(data[[i]], attr, "dataType") ==
+            "Junction quantification"
         junctionQuantSamples <- NULL
-        if (!is.null(junctionQuant)) {
-            samples <- colnames(junctionQuant)
-            if (any(grepl("^TCGA", samples))) {
-                junctionQuantSamples <- samples
-                data[[i]]$"Sample metadata" <- parseTcgaSampleInfo(samples)
+        if (any(match)) {
+            junctionQuant <- data[[i]][match]
+            if (!is.null(junctionQuant)) {
+                samples <- unique(unlist(lapply(junctionQuant, colnames)))
+                if (any(grepl("^TCGA", samples))) {
+                    junctionQuantSamples <- samples
+                    data[[i]]$"Sample metadata" <- parseTcgaSampleInfo(samples)
+                }
             }
         }
         
@@ -142,6 +162,8 @@ processDatasetNames <- function(data) {
         for (k in seq_along(nse)) {
             if (index[[k]]) {
                 file <- attr(newData[[each]][[k]], "filename")
+                if (is.null(file)) next
+                
                 if (grepl("illuminahiseq", file, fixed=TRUE))
                     names(newData[[each]])[[k]] <- paste(
                         names(newData[[each]])[[k]], "(Illumina HiSeq)")
@@ -228,11 +250,12 @@ dataUI <- function(id, tab) {
     ns <- NS(id)
     uiList <- getUiFunctions(
         ns, "data", bsCollapsePanel,
-        priority=paste0(c("localData", "firebrowse", "gtexData",
+        priority=paste0(c("localData", "firebrowse", "gtexData", "recountData",
                           "inclusionLevels", "geNormalisationFiltering"), "UI"))
     
     tcga <- tags$abbr(title="The Cancer Genome Atlas", "TCGA")
-    gtex <- tags$abbr(title="Genotype-Tissue Expression", "GTEx")
+    gtex <- tags$abbr(title="Genotype-Tissue Expression project", "GTEx")
+    sra  <- tags$abbr(title="Sequence Read Archive", "SRA")
     
     analysesDescription <- tagList(
         fluidRow(
@@ -263,17 +286,22 @@ dataUI <- function(id, tab) {
     
     welcome <- div(
         id=ns("welcome"),
+        linkToArticle(),
         h1("Welcome"), HTML(paste0(
-            "Analyse alternative splicing based on transcriptomic and ",
-            "clinical data from The Cancer Genome Atlas (", tcga, ") or the ",
-            "Genotype-Tissue Expression (", gtex, ") project.")),
+            "Perform integrative analyses of alternative splicing and gene ",
+            "expression based on transcriptomic and sample-associated data ",
+            "from The Cancer Genome Atlas (", tcga, "), the Genotype-Tissue ",
+            "Expression (", gtex, ") project, Sequence Read Archive (", sra, 
+            ") or user-owned data.")),
         tags$br(), tags$br(), tags$ol(
             id="list",
-            tags$li("Load clinical data and alternative splicing",
-                    "junction quantification from", tcga, "or", gtex, ".", 
-                    tags$br(), tags$small(
-                        style="color: gray;",
-                        "More data types will soon be supported.")),
+            tags$li(HTML(paste0(
+                "Load gene expression values, alternative splicing ",
+                "junction quantification and/or sample-associated data ",
+                "from ", tcga, ", ", gtex, ", ", sra, " or user-owned data.",
+                tags$br(), tags$small(
+                    style="color: gray;",
+                    "More data types will soon be supported.")))),
             tags$li("Quantify alternative splicing events based on the",
                     "values from the percent spliced-in (PSI) metric.",
                     # "The following event types are available:",
@@ -291,11 +319,11 @@ dataUI <- function(id, tab) {
                     "following analyses:")), 
         analysesDescription, br(), br(),
         p(style="text-align:right",
-          tags$a(href="http://imm.medicina.ulisboa.pt/group/compbio/",
-                 target="_blank", "Nuno Morais Lab, iMM"), 
+          tags$a(href="http://imm.medicina.ulisboa.pt/group/distrans/",
+                 target="_blank", "Disease Transcriptomics Lab, iMM"), 
           "(", tags$a(href="mailto:nunodanielagostinho@gmail.com", 
                       "Nuno Saraiva-Agostinho", icon("envelope-o")),
-          ", 2015-2017)", 
+          ", 2015-2018)", 
           br(), "Special thanks to my lab colleagues for their work-related",
           br(), "support and supporting chatter."))
     
@@ -498,8 +526,8 @@ dataServer <- function(input, output, session) {
         samples    <- getSampleId()
         sampleInfo <- getSampleInfo()
         if ( !is.null(patients) && !is.null(samples) ) {
-            startProgress("Matching patients with samples...", 1)
-            match <- getPatientFromSample(samples, patients,
+            startProgress("Matching subjects to their samples...", 1)
+            match <- getSubjectFromSample(samples, patients, 
                                           sampleInfo=sampleInfo)
             setClinicalMatchFrom("Inclusion levels", match)
             closeProgress("Matching process concluded")
@@ -507,10 +535,9 @@ dataServer <- function(input, output, session) {
     })
     
     # Run server logic from the scripts
-    getServerFunctions(
-        "data", priority=paste0(
-            c("localData", "firebrowse", "gtexData",
-              "inclusionLevels", "geNormalisationFiltering"), "Server"))
+    getServerFunctions("data", priority=paste0(
+        c("localData", "firebrowse", "gtexData",
+          "inclusionLevels", "geNormalisationFiltering"), "Server"))
 }
 
 attr(dataUI, "loader") <- "app"
